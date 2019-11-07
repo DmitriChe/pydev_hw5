@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+import json
 
 from account import account
 from victorina import victorina
@@ -61,6 +62,28 @@ def change_dir(dir_path):
         return 'Нет такой директории! Попробуйте еще раз.'
 
 
+def save_dirlist():
+    dirlist_data = {
+        'files': [],
+        'dirs': [],
+    }
+    dir_list = os.listdir(os.getcwd())
+    for item in dir_list:
+        if os.path.isfile(item):
+            dirlist_data['files'].append(item)
+        else:
+            dirlist_data['dirs'].append(item)
+
+    with open('dir_list', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(dirlist_data))
+    with open('dir_list', 'r', encoding='utf-8') as f:
+        # f.read(json.dumps(dirlist_data))
+        if json.load(f) == dirlist_data:
+            return 'Содержимое директории успешно записано в файл dir_list'
+        else:
+            return 'Ошибка сохранения данных директории в файл'
+
+
 if __name__ == '__main__':
 
     while True:
@@ -75,6 +98,7 @@ if __name__ == '__main__':
         print('9. играть в викторину')
         print('10. мой банковский счет')
         print('11. смена рабочей директории')
+        print('12. сохранить содержимое рабочей директории в файл')
         print('0. выход')
 
         choice = input('Выберите пункт меню: ')
@@ -100,6 +124,8 @@ if __name__ == '__main__':
             account()
         elif choice == '11':
             print(change_dir(input('Введите путь к новой рабочей директори: ')))
+        elif choice == '12':
+            print(save_dirlist())
         elif choice == '0':
             break
         else:

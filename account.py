@@ -1,39 +1,51 @@
 def account():
 
-    def add_money(payment_account, summa):
+    from os import path
+    import json
+
+
+    def add_money(account_data, summa):
 
         while not summa.isnumeric():
             input('\nВведите сумму ЦЕЛЫМ ЧИСЛОМ: ')
 
-        payment_account += int(summa)
-        print(f'Сумма на вашем счете: {payment_account} р.')
-        return payment_account
+        account_data['account'] += int(summa)
+        print(f"Сумма на вашем счете: {account_data['account']} р.")
+        return account_data
 
-    def bue(payment_account, history, summa):
+    def bue(account_data, summa):
 
         while not summa.isnumeric():
-            input('Введите сумму ЦЕЛЫМ ЧИСЛОМ: ')
+            summa = input('Введите сумму ЦЕЛЫМ ЧИСЛОМ: ')
 
         summa = int(summa)
 
-        if summa > payment_account:
+        if summa > account_data['account']:
             print('Недостаточно средств на счете!')
         else:
-            payment_account -= summa
-            history[input('Введите название товара: ')] = summa
+            account_data['account'] -= summa
+            account_data[input('Введите название товара: ')] = summa
 
-        return payment_account, history
+        return account_data
 
-    def shopping_list(history):
-        if len(history) > 0:
+    def print_shopping_list(account_data):
+        if len(account_data) > 1:
             print('\nИстория покупок:')
-            for key, val in history.items():
-                print(f'{key} --> {val} р.')
+            for key, val in account_data.items():
+                if key != 'account':
+                    print(f'{key} --> {val} р.')
         else:
             print('\nСписок покупок пока пуст!')
 
-    payment_account = 0
-    history = {}
+
+    account_data = {
+        'account': 0,
+    }
+
+    account_file_path = './account_data'
+    if path.exists(account_file_path):
+        with open(account_file_path, 'r', encoding='utf-8') as f:
+            account_data = json.load(f)
 
     while True:
         print('\n1. пополнение счета')
@@ -43,12 +55,20 @@ def account():
 
         choice = input('Выберите пункт меню: ')
         if choice == '1':
-            payment_account = add_money(payment_account, input('\nВведите сумму для пополнения счета: '))
+            account_data = add_money(account_data, input('\nВведите сумму для пополнения счета: '))
         elif choice == '2':
-            payment_account, history = bue(payment_account, history, input('\nВведите сумму покупки: '))
+            account_data = bue(account_data, input('\nВведите сумму покупки: '))
         elif choice == '3':
-            shopping_list(history)
+            print_shopping_list(account_data)
         elif choice == '4':
             break
         else:
             print('\nНеверный пункт меню\n')
+
+    with open(account_file_path, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(account_data))
+
+
+if __name__ == '__main__':
+
+    account()
