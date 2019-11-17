@@ -1,9 +1,12 @@
+from os import path
+import json
+
+from decorators import print_function_info
+
+
 def account():
 
-    from os import path
-    import json
-
-
+    @print_function_info
     def add_money(account_data, summa):
 
         while not summa.isnumeric():
@@ -13,6 +16,7 @@ def account():
         print(f"Сумма на вашем счете: {account_data['account']} р.")
         return account_data
 
+    @print_function_info
     def bue(account_data, summa):
 
         while not summa.isnumeric():
@@ -28,6 +32,7 @@ def account():
 
         return account_data
 
+    @print_function_info
     def print_shopping_list(account_data):
         if len(account_data) > 1:
             print('\nИстория покупок:')
@@ -43,9 +48,12 @@ def account():
     }
 
     account_file_path = './account_data'
-    if path.exists(account_file_path):
-        with open(account_file_path, 'r', encoding='utf-8') as f:
-            account_data = json.load(f)
+    try:
+        if path.exists(account_file_path):
+            with open(account_file_path, 'r', encoding='utf-8') as f:
+                account_data = json.load(f)
+    except OSError as e:
+        print(e.errno)
 
     while True:
         print('\n1. пополнение счета')
@@ -65,8 +73,11 @@ def account():
         else:
             print('\nНеверный пункт меню\n')
 
-    with open(account_file_path, 'w', encoding='utf-8') as f:
-        f.write(json.dumps(account_data))
+    try:
+        with open(account_file_path, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(account_data))
+    except OSError as e:
+        print(e.errno)
 
 
 if __name__ == '__main__':
